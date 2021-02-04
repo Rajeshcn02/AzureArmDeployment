@@ -1,0 +1,99 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "StorageActName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "AppPlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "WebAppName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "WebApp2Name": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('StorageActName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Premium_LRS",
+                "tier": "Premium"
+            }
+        },
+        {
+            "name": "[parameters('AppPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "F1",
+                "capacity": 2
+            },
+            "tags": {
+                "displayName": "appServicePlan1"
+            },
+            "properties": {
+                "name": "[parameters('AppPlanName')]"
+            }
+        },
+        {
+            "name": "[parameters('WebAppName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/' ,parameters('AppPlanName'))]": "Resource",
+                "displayName": "webApp1"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('AppPlanName'))]"
+            ],
+            "properties": {
+                "name": "[parameters('WebAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppPlanName'))]"
+            }
+        },
+        {
+            "name": "[parameters('WebApp2Name')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/',parameters('AppPlanName'))]": "Resource",
+                "displayName": "[parameters('WebApp2Name')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('AppPlanName'))]"
+            ],
+            "properties": {
+                "name": "[parameters('WebApp2Name')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppPlanName'))]"
+            }
+        }
+    ],
+    "outputs": {}
+}
